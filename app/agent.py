@@ -26,9 +26,9 @@ from app.models import (
     Suggestion,
 )
 
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-USE_REAL_LLM = bool(ANTHROPIC_API_KEY)
-LLM_MODEL = "claude-sonnet-4-6"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+USE_REAL_LLM = bool(GEMINI_API_KEY)
+LLM_MODEL = "gemini-3.6-flash"
 
 
 class AgentState(TypedDict):
@@ -64,7 +64,7 @@ Rules for you specifically:
 
 
 def _propose_suggestions_llm(state: AgentState) -> AgentState:
-    """Real reasoning step: calls Claude with cart + catalog context and
+    """Real reasoning step: calls Gemini with cart + catalog context and
     parses back a list of candidate Suggestions.
 
     IMPORTANT: this function's output is UNTRUSTED. It only ever produces
@@ -89,21 +89,36 @@ def _propose_suggestions_llm(state: AgentState) -> AgentState:
     })
 
     try:
-        import anthropic
+        import re
+        import sys
+        from google import genai
+        from google.genai import types
 
-        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        response = client.messages.create(
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
             model=LLM_MODEL,
-            max_tokens=500,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_content}],
+            contents=user_content,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                max_output_tokens=1024,
+            ),
         )
-        raw_text = "".join(
-            block.text for block in response.content if getattr(block, "type", None) == "text"
-        ).strip()
 
-        # Defensive parsing — LLM output is untrusted, never trust it blindly.
+        # Safely access .text — response may be blocked/empty
+        try:
+            raw_text = response.text or ""
+        except Exception:
+            raw_text = ""
+        raw_text = raw_text.strip()
+
+        # Strip markdown fences if present
         raw_text = raw_text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+
+        # If the model wrapped JSON in prose, extract the array with regex
+        if raw_text and not raw_text.startswith("["):
+            match = re.search(r"\[.*\]", raw_text, re.DOTALL)
+            raw_text = match.group(0) if match else ""
+
         candidates = json.loads(raw_text) if raw_text else []
 
         suggestions: list[Suggestion] = []
@@ -123,8 +138,9 @@ def _propose_suggestions_llm(state: AgentState) -> AgentState:
             )
         state["suggestions"] = suggestions
 
-    except Exception:
-        # LLM/network failure should degrade gracefully, not crash the turn.
+    except Exception as exc:
+        # Log so the error appears in server output, then degrade gracefully.
+        print(f"[agent] LLM error: {type(exc).__name__}: {exc}", file=sys.stderr)
         state["suggestions"] = []
 
     return state
