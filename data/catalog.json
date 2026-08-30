@@ -1,0 +1,56 @@
+[
+  {
+    "id": "sku_001",
+    "name": "Wireless Mouse",
+    "category": "accessories",
+    "price": 799,
+    "margin_pct": 35,
+    "stock": 42,
+    "pairs_well_with": ["sku_002", "sku_004"]
+  },
+  {
+    "id": "sku_002",
+    "name": "Mechanical Keyboard",
+    "category": "accessories",
+    "price": 2999,
+    "margin_pct": 28,
+    "stock": 15,
+    "pairs_well_with": ["sku_001", "sku_003"]
+  },
+  {
+    "id": "sku_003",
+    "name": "Laptop Stand",
+    "category": "accessories",
+    "price": 1299,
+    "margin_pct": 40,
+    "stock": 0,
+    "pairs_well_with": ["sku_002"]
+  },
+  {
+    "id": "sku_004",
+    "name": "USB-C Hub",
+    "category": "accessories",
+    "price": 1599,
+    "margin_pct": 32,
+    "stock": 23,
+    "pairs_well_with": ["sku_001", "sku_005"]
+  },
+  {
+    "id": "sku_005",
+    "name": "Noise Cancelling Headphones",
+    "category": "audio",
+    "price": 4999,
+    "margin_pct": 22,
+    "stock": 8,
+    "pairs_well_with": ["sku_004"]
+  },
+  {
+    "id": "sku_006",
+    "name": "Webcam 1080p",
+    "category": "video",
+    "price": 2199,
+    "margin_pct": 18,
+    "stock": 30,
+    "pairs_well_with": ["sku_002"]
+  }
+]

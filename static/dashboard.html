@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Upsell Agent — Audit Dashboard</title>
+<style>
+  body { font-family: -apple-system, sans-serif; margin: 2rem; background: #fafafa; color: #222; }
+  h1 { font-size: 1.4rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: white; }
+  th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #eee; font-size: 0.85rem; vertical-align: top; }
+  th { background: #f0f0f0; }
+  .approved { color: #1a7f37; font-weight: 600; }
+  .rejected { color: #b91c1c; font-weight: 600; }
+  .trail { font-size: 0.75rem; color: #666; white-space: pre-line; }
+  #refresh { margin-top: 1rem; padding: 0.4rem 0.8rem; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h1>Upsell Agent — Trace &amp; Outcomes</h1>
+  <button id="refresh" onclick="load()">Refresh</button>
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th>Time</th><th>Session</th><th>SKU</th><th>Agent reasoning</th>
+        <th>Decision</th><th>Discount</th><th>Rule trail</th><th>Execution</th>
+      </tr>
+    </thead>
+    <tbody id="body"></tbody>
+  </table>
+
+  <script>
+    async function load() {
+      const res = await fetch('/audit');
+      const rows = await res.json();
+      const body = document.getElementById('body');
+      body.innerHTML = '';
+      rows.slice().reverse().forEach(r => {
+        const tr = document.createElement('tr');
+        const decisionClass = r.policy_decision.approved ? 'approved' : 'rejected';
+        const decisionText = r.policy_decision.approved ? 'APPROVED' : 'REJECTED';
+        const exec = r.executed_action ? `${r.executed_action.status} (${r.executed_action.action_type})` : '—';
+        tr.innerHTML = `
+          <td>${new Date(r.timestamp).toLocaleTimeString()}</td>
+          <td>${r.session_id}</td>
+          <td>${r.suggestion.sku} — ${r.suggestion.name}</td>
+          <td>${r.agent_reasoning}</td>
+          <td class="${decisionClass}">${decisionText}${r.policy_decision.rejection_reason ? ' — ' + r.policy_decision.rejection_reason : ''}</td>
+          <td>${r.policy_decision.final_discount_pct}%</td>
+          <td class="trail">${r.policy_decision.rule_trail.join('\n')}</td>
+          <td>${exec}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+    load();
+  </script>
+</body>
+</html>
