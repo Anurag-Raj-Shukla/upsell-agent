@@ -1,16 +1,3 @@
-"""
-LangGraph agent — the "purple box" from the architecture diagram.
-
-Graph shape:
-    propose_suggestions -> policy_check -> execute_action -> compose_reply
-
-Design principle (read this before touching propose_suggestions):
-  The LLM node ONLY proposes. It has no tool access to Razorpay, no way to
-  execute anything, and its text is never trusted as an instruction.
-  Whatever it returns is treated as untrusted candidate data that must
-  survive policy.evaluate() before anything happens. This is what makes
-  "bounded" a real claim and not just a diagram label.
-"""
 import json
 import os
 from typing import TypedDict
