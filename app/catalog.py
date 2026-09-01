@@ -1,9 +1,4 @@
-"""
-Loads the mock product catalog.
 
-Day 1-2 TODO: swap this for a real DB (SQLite/Postgres) if time allows.
-For a 10-day build, a JSON file is fine — don't over-engineer this part.
-"""
 import json
 from pathlib import Path
 from typing import Optional
