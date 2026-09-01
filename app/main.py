@@ -1,15 +1,4 @@
-"""
-FastAPI entry point.
 
-Run locally:
-    uvicorn app.main:app --reload
-
-Endpoints:
-    POST /chat            -> run the agent for one turn
-    GET  /audit            -> full audit log (JSON, for the dashboard)
-    GET  /audit/{session}  -> audit log filtered to one session
-    GET  /dashboard        -> simple HTML dashboard (static/dashboard.html)
-"""
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
