@@ -1,16 +1,4 @@
-"""
-SQLite persistence layer.
 
-Replaces the in-memory list/dict that audit.py and policy.py used to keep
-state in. Two tables:
-  - audit_entries: one row per (suggestion, policy decision, execution)
-  - session_counts: suggestion count per session_id, for the frequency cap
-
-Kept as raw sqlite3 (no ORM) on purpose — this app is small enough that
-SQLAlchemy would be more ceremony than it's worth for a 10-day build.
-If the project grows past this hackathon, swapping to SQLAlchemy later
-is a contained change (only this file needs to change).
-"""
 import json
 import sqlite3
 from contextlib import contextmanager
