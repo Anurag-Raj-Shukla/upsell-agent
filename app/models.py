@@ -1,9 +1,4 @@
-"""
-Shared data models for the upsell/cross-sell agent.
 
-Keep this file the single source of truth for request/response shapes so
-the agent, policy engine, and API layer never drift out of sync.
-"""
 from __future__ import annotations
 
 from datetime import datetime, timezone
