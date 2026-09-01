@@ -1,10 +1,4 @@
-"""
-Audit log — records every decision the agent + policy engine made,
-regardless of approve/reject outcome. This is what the admin dashboard
-reads from.
 
-Backed by SQLite (see app/db.py) so entries survive server restarts.
-"""
 from app import db
 from app.models import AuditEntry
 
