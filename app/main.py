@@ -1,7 +1,7 @@
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 load_dotenv()  # must run before app.razorpay_client reads env vars at import time
@@ -13,6 +13,12 @@ from app.models import ChatRequest, ChatResponse
 app = FastAPI(title="Merchant Upsell Agent", version="0.1.0")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/dashboard")
 
 
 @app.on_event("startup")
